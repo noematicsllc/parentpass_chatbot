@@ -16,13 +16,20 @@ except ImportError:
     # Fallback for direct script execution
     from azure_analytics import AzureAnalytics
 
-# Module-level BigQuery client
-client = bigquery.Client()
-
 # Get BigQuery project and dataset from environment
 BQ_PROJECT = os.getenv("BQ_PROJECT")
 BQ_DATASET = os.getenv("BQ_DATASET")
+
+# Validate required environment variables
+if not BQ_PROJECT or not BQ_DATASET:
+    raise ValueError(
+        "Missing required environment variables: BQ_PROJECT and BQ_DATASET must be set in .env file"
+    )
+
 BQ_TABLE_PREFIX = f"`{BQ_PROJECT}.{BQ_DATASET}.events_*`"
+
+# Module-level BigQuery client with correct project
+client = bigquery.Client(project=BQ_PROJECT)
 
 def get_bq_table_name() -> str:
     """Get the full BigQuery table name from environment variables."""
@@ -246,7 +253,7 @@ def time_spent_in_app(
         timestamp_from = timestamp_to - timedelta(days=7)
     
     # SQL query with parameterized variables
-    query = """
+    query = f"""
     Select date_time, is_guest , avg(count) as time from
       (SELECT
           FORMAT_DATETIME(@grouper, DATETIME(TIMESTAMP_MICROS(event_timestamp))) date_time,
@@ -333,7 +340,7 @@ def section_visit(
         timestamp_from = timestamp_to - timedelta(days=7)
     
     # SQL query with parameterized variables
-    query = """
+    query = f"""
     SELECT
       FORMAT_DATETIME(@grouper, DATETIME(TIMESTAMP_MICROS(event_timestamp))) date_time,
       event_param.value.string_value screen,
@@ -423,7 +430,7 @@ def search_statistics(
         timestamp_from = timestamp_to - timedelta(days=7)
     
     # SQL query with parameterized variables
-    query = """
+    query = f"""
     Select text, Sum(count) count, Count(user_id) users from 
     (SELECT
       event_param.value.string_value text,
@@ -504,7 +511,7 @@ def push_notification(
         timestamp_from = timestamp_to - timedelta(days=7)
     
     # SQL query with parameterized variables
-    query = """
+    query = f"""
     SELECT
           FORMAT_DATETIME(@grouper, DATETIME(TIMESTAMP_MICROS(event_timestamp))) date_time,
           event_name,
@@ -566,7 +573,7 @@ def event_count_ungrouped(
     bq_client = bigquery_client or client
     
     # SQL query with parameterized variables
-    query = """
+    query = f"""
     SELECT
       COUNT(*) Count
     FROM
@@ -629,7 +636,7 @@ def event_count(
         timestamp_from = timestamp_to - timedelta(days=7)
     
     # SQL query with parameterized variables
-    query = """
+    query = f"""
     SELECT
       FORMAT_DATETIME(@grouper, DATETIME(TIMESTAMP_MICROS(event_timestamp))) date_time,
       COUNT(*) count
@@ -691,7 +698,7 @@ def average_onboarding_time(
     bq_client = bigquery_client or client
     
     # SQL query - no parameters needed for this one
-    query = """
+    query = f"""
     Select Avg(time) Avg_Onboarding_Time from
       (SELECT
       user_id, Sum(engagement_time_msec) time
@@ -765,7 +772,7 @@ def average_appactivity_time(
     bq_client = bigquery_client or client
     
     # SQL query - no parameters needed for this one
-    query = """
+    query = f"""
     Select Avg(time) Avg_AppActivity_Time 
     FROM
     (
@@ -830,7 +837,7 @@ def active_total_users(
     bq_client = bigquery_client or client
     
     # SQL query - combines three separate queries for different time periods
-    query = """
+    query = f"""
     SELECT '1_day' as period, Count(*) Active_Users
     from
     (SELECT

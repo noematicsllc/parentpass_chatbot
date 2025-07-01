@@ -5,3 +5,4 @@ app/__pycache__/
 baml_client/
 analytics_reports/
 uv.lock
+*.log
