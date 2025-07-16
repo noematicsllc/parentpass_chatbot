@@ -37,7 +37,7 @@ Notes:
 
 2. **Configure environment:**
    ```bash
-   cp env.docker.example .env
+   cp env.example .env
    # Edit .env with your actual values
    ```
 
