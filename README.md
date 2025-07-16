@@ -24,7 +24,6 @@ Notes:
 ### Prerequisites
 - Docker and Docker Compose installed
 - Google Cloud CLI installed (`gcloud`)
-- Access to a Google Cloud project with BigQuery
 
 ### Setup
 1. **Authenticate with Google Cloud:**
