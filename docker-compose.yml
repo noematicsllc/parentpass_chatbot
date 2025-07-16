@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    ports:
+      - "8000:8000"
+    environment:
+      # Environment variables for the application
+      - PP_API_KEY=${PP_API_KEY}
+      # Database configuration
+      - DB_SERVER=${DB_SERVER}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # BigQuery configuration  
+      - BQ_PROJECT=${BQ_PROJECT}
+      - BQ_DATASET=${BQ_DATASET}
+      # AI API keys
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # Use Application Default Credentials (ADC) instead of service account file
+      # Comment out the line below if you want to use ADC
+      # - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/service-account.json
+    volumes:
+      # Mount source code for development (hot reload)
+      - ./app:/app/app:ro
+      - ./baml_src:/app/baml_src:ro
+      # Mount Google Cloud credentials for ADC support
+      # This mounts your local gcloud credentials into the container
+      - /home/path/.config/gcloud:/root/.config/gcloud:ro
+      # Optional: Mount credentials directory if you want to use service account files
+      # - ./credentials:/app/credentials:ro
+      # Mount logs directory
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

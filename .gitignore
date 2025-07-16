@@ -1,8 +1,15 @@
 .venv/
 *.env
 *_schema.json
+app/*/__pycache__
 app/__pycache__/
+tests/__pycache__/
+__pycache__/
 baml_client/
 analytics_reports/
 uv.lock
 *.log
+.pytest_cache/
+app/htmlcov/
+application_default_credentials.json
+credentials/

@@ -74,10 +74,24 @@ def time_spent_by_section(
     Select date_time, section, avg(count) as time from
       (SELECT
           FORMAT_DATETIME(grouper, DATETIME(TIMESTAMP_MICROS(event_timestamp))) date_time,
-          case When event_param.value.string_value in ("CHAT_HOME", "NIGHBOURHOOD_NEWS", "CHAT_TOPICS", "NEW_POST", "POST_DETAILS", "CHAT_IMAGE_GALLERY", "SUGGEST_TOPICS", "CHAT_GENERAL_SEARCH") then "Post"
-               WHEN event_param.value.string_value in ("FREEBIE_HOME", "freebie_listing", "FREEBIE_SEARCH_LIST", "FREEBIE_REQUESTED", "MY_FREEBIE", "SAVED_FREEBIE", "FREEBIE_CATEGORIES", "FREEBIE_DETAILS", "ADD_FREEBIE", "FREEBIE_CONTACT_INFORMATION") then "Freebie"
+          case When event_param.value.string_value in (
+                "CHAT_HOME", "NIGHBOURHOOD_NEWS", "CHAT_TOPICS", "NEW_POST", 
+                "POST_DETAILS", "CHAT_IMAGE_GALLERY", "SUGGEST_TOPICS", "CHAT_GENERAL_SEARCH"
+              ) then "Post"
+               WHEN event_param.value.string_value in (
+                 "FREEBIE_HOME", "freebie_listing", "FREEBIE_SEARCH_LIST", "FREEBIE_REQUESTED", 
+                 "MY_FREEBIE", "SAVED_FREEBIE", "FREEBIE_CATEGORIES", "FREEBIE_DETAILS", 
+                 "ADD_FREEBIE", "FREEBIE_CONTACT_INFORMATION"
+               ) then "Freebie"
                WHEN event_param.value.string_value in ("SAFETY", "SAFETY_LISTING", "REPORT_CRIME") then "Crime"
-                WHEN event_param.value.string_value in ("RECOMMEND_HOME", "CONNECT_CHILD_LIST", "TARRANT_AREA_FOOD", "COMMUNITY_LINK", "SUGGEST_PARTNER", "ADD_COMMUNITY_REVIEW", "COOK_CHILDREN_HEALTH_SYSTEM", "MERCY_CLINIC", "CORNERSTONE_CHARITY", "RENT_UTILITIES", "RENTERS_RIGHTS", "HOMEOWNER_PREP", "HOMEBUYER_ASSISTANCE", "LENA_POPE", "LUCINE_CENTER", "MY_HEALTH_MY_RESOURCES", "THE_PARENTING_CENTER", "INDIVIDUAL_PARTNER_PROFILE", "JPS_HEALTH", "lookup_address") then "Recommend"
+                                 WHEN event_param.value.string_value in (
+                   "RECOMMEND_HOME", "CONNECT_CHILD_LIST", "TARRANT_AREA_FOOD", "COMMUNITY_LINK", 
+                   "SUGGEST_PARTNER", "ADD_COMMUNITY_REVIEW", "COOK_CHILDREN_HEALTH_SYSTEM", 
+                   "MERCY_CLINIC", "CORNERSTONE_CHARITY", "RENT_UTILITIES", "RENTERS_RIGHTS", 
+                   "HOMEOWNER_PREP", "HOMEBUYER_ASSISTANCE", "LENA_POPE", "LUCINE_CENTER", 
+                   "MY_HEALTH_MY_RESOURCES", "THE_PARENTING_CENTER", "INDIVIDUAL_PARTNER_PROFILE", 
+                   "JPS_HEALTH", "lookup_address"
+                 ) then "Recommend"
                 WHEN event_param.value.string_value in ( "CALL", "CALL_DETAILS") then "Hotline"
                 WHEN event_param.value.string_value in ("VIEW_HOME", "VIEW_MAP", "ADD_ACTIVITY", "ACTIVITY_PROFILE", "VIEW_SEARCH", "ADD_ACTIVITY_RECURRENCE", "MY_ACTIVITIES", "ATTENDING_ACTIVITIES", "MIGHT_ATTEND_ACTIVITIES", "EVENT_ROUNDUP") then "Event"
                 WHEN event_param.value.string_value in ("ACTIVITY_SCREEN", "ACTIVITY_LIST", "ACTIVITY_DETAILS", "PDF") then "Activity"

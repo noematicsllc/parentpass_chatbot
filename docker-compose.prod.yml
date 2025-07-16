@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    ports:
+      - "8000:8000"
+    environment:
+      # Production environment variables
+      - PP_API_KEY=${PP_API_KEY}
+      # Database configuration
+      - DB_SERVER=${DB_SERVER}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # BigQuery configuration
+      - BQ_PROJECT=${BQ_PROJECT}
+      - BQ_DATASET=${BQ_DATASET}
+      # AI API keys
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # For production, prefer service account files or workload identity
+      # Use one of the following authentication methods:
+      # Service account file (traditional approach)
+      # - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/service-account.json
+      # Service account key as environment variable
+      # - GOOGLE_APPLICATION_CREDENTIALS_JSON=${GOOGLE_APPLICATION_CREDENTIALS_JSON}
+      # For local development with ADC, mount gcloud credentials
+      # Production settings
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    volumes:
+      # Production volumes - only mount necessary directories
+      # For service account file authentication
+      # - ./credentials:/app/credentials:ro
+      # For local development with ADC (uncomment if needed)
+      # - /home/path/.config/gcloud:/root/.config/gcloud:ro
+      # Always mount logs for production monitoring
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Production command with multiple workers
+    command: [
+      "uvicorn", 
+      "app.main:app", 
+      "--host", "0.0.0.0", 
+      "--port", "8000", 
+      "--workers", "4",
+      "--access-log",
+      "--log-level", "info"
+    ]

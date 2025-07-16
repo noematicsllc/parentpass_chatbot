@@ -2,7 +2,55 @@
 
 A FastAPI-based chatbot API for ParentPass that provides intelligent responses and analytics data access using BAML (Boundary ML) for LLM orchestration.
 
-## Quick Start
+## Changelog 2025-07-16
+
+Implemented recommendations:
+- Refactored endpoints into separate routers for health, queries, and sessions.
+- Added response models, improved docstrings
+- Added support for Docker deployment
+- Used `flake8` and `black` for linting
+
+Notes:
+- Response code for session creation endpoint (`POST /api/sessions`) now returns HTTP status **201 (Created)** instead of **200 (OK)** to follow REST API best practices
+- Docker configuration will have to be modified according to gcloud authentication practices.
+- All endpoint URLs remain unchanged
+- Request formats remain unchanged, response formats are backwards compatible.
+- BAML updated to version 0.202.00
+- Added basic pytest framework
+- Added a basic cli client for convenient interactive testing
+
+## Quick Start (Docker)
+
+### Prerequisites
+- Docker and Docker Compose installed
+- Google Cloud CLI installed (`gcloud`)
+- Access to a Google Cloud project with BigQuery
+
+### Setup
+1. **Authenticate with Google Cloud:**
+   ```bash
+   gcloud auth login
+   gcloud auth application-default login
+   gcloud config set project YOUR_PROJECT_ID
+   ```
+
+**Note:** This method will use your local gcloud credentials (Application Default Credentials) mounted from `/your/home/path/.config/gcloud`. If you use another authentication method (ie, service account), edit `.env` and the `docker-compose.yml` file for your environment.
+
+2. **Configure environment:**
+   ```bash
+   cp env.docker.example .env
+   # Edit .env with your actual values
+   ```
+
+3. **Build and run:**
+   ```bash
+   docker-compose build
+   docker-compose up
+   ```
+
+
+
+## Quick Start (Local Development)
 
 ### Prerequisites
 
